@@ -2,6 +2,23 @@
 // FIREBASE CONFIGURATION & INITIALIZATION
 // ============================================
 
+// Base path helper for GitHub Pages compatibility
+// Works for both root deployments and subdirectory deployments
+function getBasePath() {
+    const path = window.location.pathname;
+    if (path.includes('/media-website/')) {
+        return './';
+    }
+    return './';
+}
+
+const BASE_PATH = getBasePath();
+
+// Helper function to navigate with correct base path
+function navigateTo(path) {
+    window.location.href = BASE_PATH + path.replace(/^\.\//, '');
+}
+
 // Firebase configuration is loaded at runtime from:
 // 1) window.FIREBASE_CONFIG (if injected), or
 // 2) /assets/js/firebase-runtime-config.json (local, gitignored)

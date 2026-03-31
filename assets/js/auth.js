@@ -56,7 +56,7 @@ async function logoutUser() {
         currentUser = null;
         userRole = null;
         // Always return user to login after sign-out
-        window.location.href = '/auth/login.html';
+        window.location.href = './auth/login.html';
         return true;
     } catch (error) {
         console.error('✗ Logout error:', error.message);

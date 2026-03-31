@@ -22,14 +22,14 @@
             const role = getUserRole();
 
             if (!user) {
-                window.location.href = '/auth/login.html';
+                window.location.href = './auth/login.html';
                 return;
             }
 
             if (role === 'admin') {
-                window.location.href = '/admin/dashboard.html';
+                window.location.href = './admin/dashboard.html';
             } else {
-                window.location.href = '/user/dashboard.html';
+                window.location.href = './user/dashboard.html';
             }
         }
 
