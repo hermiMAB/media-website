@@ -75,7 +75,7 @@ In Firebase Console:
 2. Click **Create bucket**
 3. Accept defaults
 
-### Step 3: Configure Your App
+### Step 3: Configure Your App (Safe Local Setup)
 
 1. Go to Project Settings (⚙️ icon)
 2. Under "Your apps", click **Add app** → **Web**
@@ -92,11 +92,35 @@ const firebaseConfig = {
 };
 ```
 
-### Step 4: Update Configuration
+### Step 4: Create Local Runtime Config (Do Not Commit Secrets)
 
-Edit `assets/js/firebase-config.js` and replace the `firebaseConfig` object with your credentials.
+1. Copy the example file:
 
-### Step 5: Set Up Demo Users
+```bash
+cp assets/js/firebase-runtime-config.example.json assets/js/firebase-runtime-config.json
+```
+
+2. Open `assets/js/firebase-runtime-config.json`
+3. Paste your Firebase values into that file
+4. Keep using `firebase-config.js` as-is (it now loads runtime config automatically)
+
+Important:
+- `assets/js/firebase-runtime-config.json` is gitignored
+- never paste real keys into tracked files
+- only commit `firebase-runtime-config.example.json` with placeholder values
+
+### Step 5: If a Key Was Exposed, Rotate It Immediately
+
+1. Go to Google Cloud Console -> APIs & Services -> Credentials
+2. Find the leaked key and **Regenerate key** (or create a new one, then disable old key)
+3. Add **Application restrictions**:
+   - HTTP referrers (web sites)
+   - allow only your local/dev/prod domains
+4. Add **API restrictions**:
+   - allow only Firebase APIs your app uses
+5. Check billing and API usage for unexpected traffic
+
+### Step 6: Set Up Demo Users
 
 Create test users in Firebase Console:
 
@@ -210,6 +234,15 @@ university-email-portal/
 └── data/
     └── mock-submissions.json (TODO)
 ```
+
+---
+
+## Security Notes
+
+- Firebase Web API keys are public-facing identifiers, but still must be protected with restrictions.
+- Use strict Firebase Security Rules for Firestore/Storage.
+- Never store service account keys or admin credentials in frontend code.
+- Keep sensitive runtime config in local ignored files or secure environment configuration.
 
 ---
 
