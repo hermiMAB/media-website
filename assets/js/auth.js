@@ -8,11 +8,16 @@
 
 async function loginUser(email, password) {
     try {
+        // Ensure auth is initialized
+        if (!auth || typeof auth.signInWithEmailAndPassword !== 'function') {
+            throw new Error('Firebase Auth not initialized. Please refresh the page.');
+        }
+        
         const result = await auth.signInWithEmailAndPassword(email, password);
         console.log('Login successful:', result.user.email);
         return result;
     } catch (error) {
-        console.error('✗ Login error:', error.message);
+        console.error('Login error:', error.message);
         throw error;
     }
 }
@@ -23,6 +28,11 @@ async function loginUser(email, password) {
 
 async function registerUser(email, password, userData) {
     try {
+        // Ensure auth and db are initialized
+        if (!auth || !db) {
+            throw new Error('Firebase not initialized. Please refresh the page.');
+        }
+        
         // Create auth user
         const result = await auth.createUserWithEmailAndPassword(email, password);
         const uid = result.user.uid;

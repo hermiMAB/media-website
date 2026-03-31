@@ -230,10 +230,40 @@
 <script>
     console.log('Login page script starting...');
 
-    // firebase-config.js already ran above — just wait for Firestore auth state
+    // Wait for Firebase to be fully initialized before setting up the form
+    function waitForFirebase() {
+        const timeoutMs = 5000;
+        const startTime = Date.now();
+        
+        const checkFirebase = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            
+            if (typeof auth !== 'undefined' && auth !== null) {
+                console.log('[Firebase Check] Auth ready after', elapsed, 'ms');
+                clearInterval(checkFirebase);
+                setupLoginPage();
+            } else if (elapsed > timeoutMs) {
+                console.error('[Firebase Check] Timeout waiting for auth after', elapsed, 'ms');
+                clearInterval(checkFirebase);
+                showInitializationError('Firebase initialization failed. Check browser console.');
+                setupLoginPage(); // Setup anyway so user can see error
+            } else {
+                console.log('[Firebase Check] Waiting...', elapsed, 'ms');
+            }
+        }, 100);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        setupLoginPage();
+        waitForFirebase();
     });
+
+    function showInitializationError(msg) {
+        const errorEl = document.getElementById('error-message');
+        if (errorEl) {
+            errorEl.textContent = msg;
+            errorEl.classList.add('show');
+        }
+    }
 
     function setupLoginPage() {
         const loginForm = document.getElementById('login-form');
@@ -243,7 +273,7 @@
         const errorMessage = document.getElementById('error-message');
 
         loginBtn.disabled = false;
-        console.log('Login page setup complete');
+        console.log('[Setup] Login page ready. Firebase Auth:', typeof auth !== 'undefined' && auth !== null);
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();

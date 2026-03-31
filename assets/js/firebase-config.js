@@ -19,10 +19,16 @@ function navigateTo(path) {
     window.location.href = BASE_PATH + path.replace(/^\.\//, '');
 }
 
-// Firebase configuration is loaded at runtime from:
-// 1) window.FIREBASE_CONFIG (if injected), or
-// 2) /assets/js/firebase-runtime-config.json (local, gitignored)
-let firebaseConfig = null;
+// Firebase configuration is loaded directly
+let firebaseConfig = {
+  apiKey: "AIzaSyA0fi27Nm__qULONxjjLzZpS6R9R3zFTRo",
+  authDomain: "university-announcement-portal.firebaseapp.com",
+  projectId: "university-announcement-portal",
+  storageBucket: "university-announcement-portal.firebasestorage.app",
+  messagingSenderId: "156934527197",
+  appId: "1:156934527197:web:d69b2d2784b3e770406334",
+  measurementId: "G-S8N008F1Y6"
+};
 
 // Global Firebase references
 let app = null;
@@ -77,22 +83,8 @@ function initializeFirebase() {
 }
 
 async function loadFirebaseConfig() {
-    if (window.FIREBASE_CONFIG && typeof window.FIREBASE_CONFIG === 'object') {
-        firebaseConfig = window.FIREBASE_CONFIG;
-        return true;
-    }
-
-    try {
-        const response = await fetch('/assets/js/firebase-runtime-config.json', { cache: 'no-store' });
-        if (!response.ok) return false;
-        const parsed = await response.json();
-        if (!parsed || !parsed.apiKey || !parsed.projectId) return false;
-        firebaseConfig = parsed;
-        return true;
-    } catch (error) {
-        console.warn('Runtime Firebase config not found:', error.message);
-        return false;
-    }
+    console.log('Using compiled Firebase config');
+    return true;
 }
 
 // ============================================
