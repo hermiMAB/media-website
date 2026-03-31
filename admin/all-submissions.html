@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Submissions - University Email Announcement Portal</title>
+    
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body { background-color: var(--bg-tertiary); }
+        .page-header { background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: var(--spacing-lg); }
+        .page-content { padding: var(--spacing-lg); }
+        .filters { background-color: white; padding: var(--spacing-lg); border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-md); }
+        .select { padding: var(--spacing-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+        .table-wrapper { background-color: white; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: var(--bg-tertiary); padding: var(--spacing-md); text-align: left; font-weight: var(--font-weight-bold); border-bottom: 2px solid var(--border-color); }
+        td { padding: var(--spacing-md); border-bottom: 1px solid var(--border-color); }
+        tr:hover { background-color: var(--bg-tertiary); }
+        .badge { display: inline-block; padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); }
+        .badge-pending { background-color: #dbeafe; color: #0c2d6b; }
+        .badge-approved { background-color: #d1fae5; color: #065f46; }
+        .badge-rejected { background-color: #fee2e2; color: #991b1b; }
+        .badge-revision { background-color: #fed7aa; color: #92400e; }
+        .btn-action { padding: var(--spacing-xs) var(--spacing-sm); margin: 0 2px; font-size: var(--font-size-sm); cursor: pointer; border: none; border-radius: var(--radius-md); transition: all var(--transition-base); }
+        .btn-review { background-color: var(--primary-color); color: white; }
+        .btn-review:hover { background-color: #1e3a8a; }
+        .btn-view { background-color: var(--border-color); color: var(--text-primary); }
+        .btn-view:hover { background-color: #e5e7eb; }
+        .empty-state { text-align: center; padding: var(--spacing-3xl); color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                Announcement Portal (Admin)
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><a href="all-submissions.html" class="navbar-link active">All Submissions</a></li>
+                <li><a href="approved.html" class="navbar-link">Approved</a></li>
+                <li><a href="settings.html" class="navbar-link">Settings</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>All Submissions</h1>
+        <p style="color: var(--text-secondary);">Manage all announcements from faculty members</p>
+    </div>
+
+    <div class="page-content">
+        <div class="filters">
+            <div>
+                <label>Status:</label>
+                <select id="filter-status" class="select" onchange="applyFilters()">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="needs_revision">Needs Revision</option>
+                </select>
+            </div>
+            <div>
+                <label>Type:</label>
+                <select id="filter-type" class="select" onchange="applyFilters()">
+                    <option value="">All</option>
+                    <option value="General">General</option>
+                    <option value="Academic">Academic</option>
+                    <option value="Event">Event</option>
+                    <option value="Urgent">Urgent</option>
+                    <option value="Club">Club</option>
+                    <option value="Job">Job</option>
+                </select>
+            </div>
+            <div>
+                <label>Search:</label>
+                <input type="text" id="search" class="select" placeholder="Search subject..." onkeyup="applyFilters()">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%;">🔍 Search</button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Type</th>
+                        <th>From</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="submissions-tbody">
+                    <tr><td colspan="6" class="empty-state">Loading submissions...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        let allSubmissions = [];
+
+        protectPageAsAdmin().then((allowed) => {
+            if (allowed) loadAllSubmissions();
+        });
+
+        async function loadAllSubmissions() {
+            try {
+                allSubmissions = await getAllSubmissions();
+                displaySubmissions(allSubmissions);
+            } catch (error) {
+                document.getElementById('submissions-tbody').innerHTML = 
+                    '<tr><td colspan="6" class="empty-state">Error: ' + error.message + '</td></tr>';
+            }
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('filter-status').value;
+            const type = document.getElementById('filter-type').value;
+            const search = document.getElementById('search').value.toLowerCase();
+            
+            const filtered = allSubmissions.filter(s => {
+                const matchStatus = !status || s.status === status;
+                const matchType = !type || s.type === type;
+                const matchSearch = !search || s.subject.toLowerCase().includes(search);
+                return matchStatus && matchType && matchSearch;
+            });
+            
+            displaySubmissions(filtered);
+        }
+
+        function displaySubmissions(submissions) {
+            const tbody = document.getElementById('submissions-tbody');
+            
+            if (submissions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No submissions found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = submissions.map(s => `
+                <tr>
+                    <td><strong>${s.subject}</strong></td>
+                    <td>${s.type}</td>
+                    <td>${s.submitterEmail}</td>
+                    <td>${formatDate(s.submittedAt)}</td>
+                    <td><span class="badge badge-${s.status}">${s.status.replace('_', ' ')}</span></td>
+                    <td>
+                        <button class="btn-action btn-review" onclick="reviewSubmission('${s.id}')">Review</button>
+                        <button class="btn-action btn-view" onclick="viewSubmission('${s.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function reviewSubmission(id) {
+            window.location.href = `../admin/review-submission.html?id=${id}`;
+        }
+
+        function viewSubmission(id) {
+            window.location.href = `../user/submission-detail.html?id=${id}`;
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

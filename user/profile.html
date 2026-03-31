@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - University Email Announcement Portal</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-tertiary);
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto var(--spacing-lg);
+            color: white;
+        }
+
+        .profile-name {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .profile-section {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-item-label {
+            font-weight: var(--font-weight-medium);
+        }
+
+        .profile-item-value {
+            color: var(--text-secondary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        @media (max-width: 767px) {
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+
+        .danger-zone {
+            background-color: #fef2f2;
+            border: 1px solid var(--danger-color);
+            border-radius: var(--radius-lg);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: var(--spacing-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                University Announcement Portal
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><a href="my-submissions.html" class="navbar-link">My Submissions</a></li>
+                <li><a href="profile.html" class="navbar-link active">Profile</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div style="padding: var(--spacing-xl);">
+        <div class="profile-container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">USER</div>
+                <h1 class="profile-name" id="profile-name">User Name</h1>
+                <p class="profile-email" id="profile-email">user@university.edu</p>
+                <button class="btn btn-secondary" onclick="toggleEditProfile()">Edit Profile</button>
+            </div>
+
+            <!-- Profile Information -->
+            <div class="profile-section">
+                <h2 class="section-title">Account Information</h2>
+                <div class="profile-item">
+                    <span class="profile-item-label">Email</span>
+                    <span class="profile-item-value" id="info-email">-</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">Name</span>
+                    <span class="profile-item-value" id="info-name">-</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">Department</span>
+                    <span class="profile-item-value" id="info-department">-</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">Role</span>
+                    <span class="profile-item-value" id="info-role">Faculty</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">Member Since</span>
+                    <span class="profile-item-value" id="info-joined">-</span>
+                </div>
+            </div>
+
+            <!-- Edit Profile Form (Hidden by default) -->
+            <div class="profile-section" id="edit-form" style="display: none;">
+                <h2 class="section-title">Edit Profile</h2>
+                <form id="profile-edit-form">
+                    <div class="form-group">
+                        <label class="form-label" for="edit-name">Full Name</label>
+                        <input type="text" id="edit-name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="edit-department">Department</label>
+                        <input type="text" id="edit-department" class="form-control">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="save-btn">
+                            <span class="loading-spinner"></span>
+                            <span class="btn-text">Save Changes</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="toggleEditProfile()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security Section -->
+            <div class="profile-section">
+                <h2 class="section-title">Security</h2>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+                        Last changed: <span id="password-changed">Never</span>
+                    </p>
+                    <button class="btn btn-secondary" onclick="changePassword()">Change Password</button>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="profile-section danger-zone">
+                <h2 class="section-title" style="color: var(--danger-color); border-bottom: 1px solid var(--danger-color);">
+                    Danger Zone
+                </h2>
+                <p style="color: #991b1b; margin-bottom: var(--spacing-lg);">
+                    These actions are permanent and cannot be undone.
+                </p>
+                <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        // Protect this page - wait for auth check
+        protectPageAsFaculty().then((allowed) => {
+            if (allowed) {
+                const profileForm = document.getElementById('profile-edit-form');
+                const editForm = document.getElementById('edit-form');
+                const saveBut = document.getElementById('save-btn');
+                setupProfile(profileForm, editForm, saveBut);
+            }
+        });
+
+        function setupProfile(profileForm, editForm, saveBut) {
+            async function loadProfile() {
+            try {
+                const profile = await getUserProfile();
+                
+                // Display profile in header
+                document.getElementById('profile-name').textContent = profile.name;
+                document.getElementById('profile-email').textContent = profile.email;
+                
+                // Update avatar
+                const avatar = document.getElementById('profile-avatar');
+                avatar.textContent = profile.name.charAt(0).toUpperCase();
+                
+                // Display profile info
+                document.getElementById('info-email').textContent = profile.email;
+                document.getElementById('info-name').textContent = profile.name;
+                document.getElementById('info-department').textContent = profile.department || 'Not specified';
+                document.getElementById('info-role').textContent = profile.role === 'admin' ? 'Administrator' : 'Faculty/Staff';
+                document.getElementById('info-joined').textContent = formatDate(profile.createdAt);
+                
+                // Pre-fill edit form
+                document.getElementById('edit-name').value = profile.name;
+                document.getElementById('edit-department').value = profile.department || '';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        function toggleEditProfile() {
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('edit-name').value.trim();
+            const department = document.getElementById('edit-department').value.trim();
+
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                await updateUserProfile({
+                    name: name,
+                    department: department
+                });
+                
+                alert('Profile updated successfully!');
+                loadProfile();
+                toggleEditProfile();
+            } catch (error) {
+                alert('Error updating profile: ' + error.message);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        function changePassword() {
+            const oldPassword = prompt('Enter your current password:');
+            if (!oldPassword) return;
+            
+            const newPassword = prompt('Enter new password (min 6 characters):');
+            if (!newPassword || newPassword.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            const confirmPassword = prompt('Confirm new password:');
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            changePassword(oldPassword, newPassword)
+                .then(() => alert('Password changed successfully!'))
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        function deleteAccount() {
+            if (!confirm('Are you sure? This action cannot be undone.')) return;
+            if (!confirm('This will permanently delete your account and all data. Continue?')) return;
+
+            const password = prompt('Enter your password to confirm account deletion:');
+            if (!password) return;
+
+            deleteUserAccount(password)
+                .then(() => {
+                    alert('Account deleted. Redirecting...');
+                    window.location.href = '/auth/login.html';
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        function setLoading(isLoading) {
+            saveBut.disabled = isLoading;
+            if (isLoading) {
+                saveBut.classList.add('loading');
+            } else {
+                saveBut.classList.remove('loading');
+            }
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+
+                loadProfile();
+            } // Close setupProfile function
+    </script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - University Email Announcement Portal</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        }
+
+        .login-card {
+            background-color: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            padding: var(--spacing-3xl);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .login-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            margin: 0 0 var(--spacing-sm) 0;
+            color: var(--text-primary);
+        }
+
+        .login-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .login-form .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .login-form .form-label {
+            color: var(--text-primary);
+        }
+
+        .login-form .form-control {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-base);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: var(--spacing-md);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .login-error {
+            background-color: #fee2e2;
+            border: 1px solid var(--danger-color);
+            color: #991b1b;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+        }
+
+        .login-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+
+        .login-divider {
+            text-align: center;
+            margin: var(--spacing-lg) 0;
+            color: var(--text-tertiary);
+            position: relative;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .login-divider::before {
+            left: 0;
+        }
+
+        .login-divider::after {
+            right: 0;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: var(--spacing-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">MAIL</div>
+                <h1 class="login-title">Announcement Portal</h1>
+                <p class="login-subtitle">University Email Management System</p>
+            </div>
+
+            <div class="login-error" id="error-message"></div>
+
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-control" 
+                        placeholder="you@university.edu"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-control" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary login-btn" id="login-btn">
+                    <span class="loading-spinner"></span>
+                    <span class="btn-text">Sign In</span>
+                </button>
+            </form>
+
+            <div class="login-links">
+                <a href="forgot-password.html">Forgot password?</a>
+            </div>
+
+            <div class="login-divider">or</div>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: var(--font-size-sm);">
+                Demo accounts available<br>
+                (Check console for test credentials)
+            </p>
+        </div>
+    </div>
+
+<!-- 1. Firebase first — NO defer -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+<!-- 2. Your app scripts after — NO defer -->
+<script src="../assets/js/firebase-config.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/guard.js"></script>
+<script src="../assets/js/utils.js"></script>
+
+<script>
+    console.log('Login page script starting...');
+
+    // firebase-config.js already ran above — just wait for Firestore auth state
+    document.addEventListener('DOMContentLoaded', function() {
+        setupLoginPage();
+    });
+
+    function setupLoginPage() {
+        const loginForm = document.getElementById('login-form');
+        const loginBtn = document.getElementById('login-btn');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+
+        loginBtn.disabled = false;
+        console.log('Login page setup complete');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email) { showError('Please enter your email'); return; }
+            if (!password) { showError('Please enter your password'); return; }
+
+            setLoginLoading(true);
+
+            try {
+                await loginUser(email, password);
+
+                // Poll for role — Firebase auth state takes a moment
+                let attempts = 0;
+                const waitForRole = setInterval(() => {
+                    attempts++;
+                    const role = getUserRole();
+                    if (role) {
+                        clearInterval(waitForRole);
+                        if (role === 'admin') {
+                            window.location.href = '../admin/dashboard.html';
+                        } else {
+                            window.location.href = '../user/dashboard.html';
+                        }
+                    } else if (attempts >= 10) {
+                        clearInterval(waitForRole);
+                        // Default to user if role not found
+                        window.location.href = '../user/dashboard.html';
+                    }
+                }, 300);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                setLoginLoading(false);
+                showError(getFirebaseErrorMessage(error));
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => errorMessage.classList.remove('show'), 5000);
+        }
+
+        function setLoginLoading(isLoading) {
+            loginBtn.disabled = isLoading;
+            loginBtn.classList.toggle('loading', isLoading);
+        }
+    }
+
+    console.log('[Demo Credentials]');
+    console.log('Faculty: faculty@university.edu / Password123!');
+    console.log('Admin: admin@university.edu / Password123!');
+    </script>
+</body>
+</html>

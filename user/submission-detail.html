@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Details - University Email Announcement Portal</title>
+    
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body { background-color: var(--bg-tertiary); }
+        .page-header { background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+        .page-content { max-width: 900px; margin: 0 auto; padding: var(--spacing-lg); }
+        .details-section { background-color: white; border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); border: 1px solid var(--border-color); }
+        .section-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-md); color: var(--text-primary); }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); }
+        .meta-item { border: 1px solid var(--border-color); padding: var(--spacing-md); border-radius: var(--radius-md); }
+        .meta-label { font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-xs); }
+        .meta-value { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); }
+        .content-box { background-color: var(--bg-tertiary); padding: var(--spacing-lg); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); white-space: pre-wrap; }
+        .status-badge { display: inline-block; padding: var(--spacing-xs) var(--spacing-sm); border-radius: var(--radius-sm); font-weight: var(--font-weight-semibold); }
+        .badge-pending { background-color: #dbeafe; color: #0c2d6b; }
+        .badge-approved { background-color: #d1fae5; color: #065f46; }
+        .badge-rejected { background-color: #fee2e2; color: #991b1b; }
+        .badge-revision { background-color: #fed7aa; color: #92400e; }
+        .feedback-box { background-color: #fef3c7; border-left: 4px solid var(--warning-color); padding: var(--spacing-lg); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); }
+        .feedback-label { font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-sm); }
+        .btn-group { display: flex; gap: var(--spacing-md); margin-top: var(--spacing-lg); }
+        .btn { padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--radius-md); font-weight: var(--font-weight-semibold); cursor: pointer; transition: all var(--transition-base); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: #1e3a8a; transform: translateY(-2px); }
+        .btn-secondary { background-color: var(--border-color); color: var(--text-primary); }
+        .btn-secondary:hover { background-color: #e5e7eb; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <div class="navbar-brand">University Announcement Portal</div>
+            </div>
+            <div class="navbar-right">
+                <button class="btn btn-secondary" onclick="logout()" style="padding: var(--spacing-sm) var(--spacing-md); border: none; border-radius: var(--radius-md); cursor: pointer;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <a href="../user/my-submissions.html" style="color: var(--primary-color); text-decoration: none;">← Back to Submissions</a>
+        <h1>Submission Details</h1>
+    </div>
+
+    <div class="page-content">
+        <div class="details-section">
+            <div class="section-title">Details</div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Submission ID</div>
+                    <div class="meta-value" id="submission-id">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Type</div>
+                    <div class="meta-value" id="type">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value" id="status">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Submitted</div>
+                    <div class="meta-value" id="submitted-date">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Deadline</div>
+                    <div class="meta-value" id="deadline">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <div class="section-title">Subject</div>
+            <div class="meta-value" id="subject" style="font-size: var(--font-size-lg);">-</div>
+        </div>
+
+        <div class="details-section">
+            <div class="section-title">Message</div>
+            <div class="content-box" id="body">-</div>
+        </div>
+
+        <div class="details-section" id="feedback-section" style="display: none;">
+            <div class="section-title">Admin Feedback</div>
+            <div class="feedback-box">
+                <div class="feedback-label">Feedback from Admin:</div>
+                <div id="feedback-text">-</div>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="window.location.href='../user/my-submissions.html'">Back to List</button>
+                <button class="btn btn-secondary" id="edit-btn" style="display: none;" onclick="editSubmission()">Edit & Resubmit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        protectPageAsFaculty().then((allowed) => {
+            if (allowed) loadSubmission();
+        });
+
+        async function loadSubmission() {
+            const id = getQueryParam('id');
+            if (!id) { window.location.href = '../user/my-submissions.html'; return; }
+            
+            try {
+                const submission = await getSubmission(id);
+                displaySubmission(submission);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displaySubmission(s) {
+            document.getElementById('submission-id').textContent = s.id;
+            document.getElementById('type').textContent = s.type;
+            document.getElementById('subject').textContent = s.subject;
+            document.getElementById('body').textContent = s.body;
+            document.getElementById('submitted-date').textContent = formatDateTime(s.submittedAt);
+            document.getElementById('deadline').textContent = formatDate(s.deadline);
+            
+            // Status
+            const statusBadge = `<span class="status-badge badge-${s.status}">${s.status.replace('_', ' ')}</span>`;
+            document.getElementById('status').innerHTML = statusBadge;
+            
+            // Show feedback if exists
+            if (s.feedback) {
+                document.getElementById('feedback-section').style.display = 'block';
+                document.getElementById('feedback-text').textContent = s.feedback;
+            }
+            
+            // Show edit if needs revision
+            if (s.status === 'needs_revision') {
+                document.getElementById('edit-btn').style.display = 'inline-block';
+            }
+            
+            window.currentSubmission = s;
+        }
+
+        function editSubmission() {
+            if (window.currentSubmission) {
+                window.location.href = `../user/edit-submission.html?id=${window.currentSubmission.id}`;
+            }
+        }
+
+        function logout() {
+            // Use shared logout handler (redirects to login)
+            logoutUser();
+        }
+    </script>
+</body>
+</html>

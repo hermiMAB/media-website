@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approved Announcements - University Email Announcement Portal</title>
+    
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body { background-color: var(--bg-tertiary); }
+        .page-header { background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: var(--spacing-lg); }
+        .page-content { padding: var(--spacing-lg); }
+        .announcement-card { background-color: white; border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); }
+        .announcement-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-sm); }
+        .announcement-meta { display: flex; gap: var(--spacing-lg); margin-bottom: var(--spacing-md); flex-wrap: wrap; }
+        .meta-item { font-size: var(--font-size-sm); color: var(--text-secondary); }
+        .announcement-content { color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+        .empty-state { text-align: center; padding: var(--spacing-3xl); color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                Announcement Portal (Admin)
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><a href="all-submissions.html" class="navbar-link">All Submissions</a></li>
+                <li><a href="approved.html" class="navbar-link active">Approved</a></li>
+                <li><a href="settings.html" class="navbar-link">Settings</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Approved Announcements</h1>
+        <p style="color: var(--text-secondary);">View all published announcements</p>
+    </div>
+
+    <div class="page-content">
+        <div id="announcements-container"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        protectPageAsAdmin().then((allowed) => {
+            if (allowed) loadApprovedAnnouncements();
+        });
+
+        async function loadApprovedAnnouncements() {
+            try {
+                const submissions = await getAllSubmissions();
+                const approved = submissions.filter(s => s.status === 'approved');
+                displayApproved(approved);
+            } catch (error) {
+                document.getElementById('announcements-container').innerHTML = 
+                    '<div class="empty-state">Error: ' + error.message + '</div>';
+            }
+        }
+
+        function displayApproved(announcements) {
+            const container = document.getElementById('announcements-container');
+            
+            if (announcements.length === 0) {
+                container.innerHTML = '<div class="empty-state">No approved announcements yet</div>';
+                return;
+            }
+            
+            container.innerHTML = announcements.map(a => `
+                <div class="announcement-card">
+                    <div class="announcement-title">${a.subject}</div>
+                    <div class="announcement-meta">
+                        <span class="meta-item">From: ${a.submitterEmail}</span>
+                        <span class="meta-item">Type: ${a.type}</span>
+                        <span class="meta-item">📅 Submitted: ${formatDate(a.submittedAt)}</span>
+                        <span class="meta-item">Deadline: ${formatDate(a.deadline)}</span>
+                    </div>
+                    <div class="announcement-content">${a.body}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

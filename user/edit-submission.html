@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Submission - University Email Announcement Portal</title>
+    
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body { background-color: var(--bg-tertiary); }
+        .page-header { background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+        .page-content { max-width: 800px; margin: 0 auto; padding: var(--spacing-lg); }
+        .form-section { background-color: white; border-radius: var(--radius-lg); padding: var(--spacing-lg); border: 1px solid var(--border-color); margin-bottom: var(--spacing-lg); }
+        .form-group { margin-bottom: var(--spacing-lg); }
+        .form-label { display: block; font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-sm); }
+        .form-control { width: 100%; padding: var(--spacing-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: var(--font-size-base); font-family: inherit; }
+        .form-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+        .btn { padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--radius-md); font-weight: var(--font-weight-semibold); cursor: pointer; transition: all var(--transition-base); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-secondary { background-color: var(--border-color); color: var(--text-primary); margin-left: var(--spacing-md); }
+        .success-msg { background-color: #d1fae5; border: 1px solid var(--success-color); color: #065f46; padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); display: none; }
+        .error-msg { background-color: #fee2e2; border: 1px solid var(--danger-color); color: #991b1b; padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); display: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <div class="navbar-brand">University Announcement Portal</div>
+            </div>
+            <div class="navbar-right">
+                <button class="btn btn-secondary" onclick="logout()" style="padding: var(--spacing-sm) var(--spacing-md); border: none; cursor: pointer;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Edit & Resubmit</h1>
+        <p style="color: var(--text-secondary);">Make changes and resubmit your announcement</p>
+    </div>
+
+    <div class="page-content">
+        <div class="success-msg" id="success-msg"></div>
+        <div class="error-msg" id="error-msg"></div>
+
+        <div class="form-section">
+            <form id="edit-form" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select id="type" class="form-control" required disabled>
+                        <option>General</option>
+                        <option>Academic</option>
+                        <option>Event</option>
+                        <option>Urgent</option>
+                        <option>Club</option>
+                        <option>Job</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subject *</label>
+                    <input type="text" id="subject" class="form-control" required placeholder="Announcement subject">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Message *</label>
+                    <textarea id="body" class="form-control" rows="8" required placeholder="Write your announcement..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Deadline *</label>
+                    <input type="datetime-local" id="deadline" class="form-control" required>
+                </div>
+
+                <div style="display: flex; gap: var(--spacing-md);">
+                    <button type="submit" class="btn btn-primary">Resubmit</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        protectPageAsFaculty().then((allowed) => {
+            if (allowed) loadSubmissionForEdit();
+        });
+
+        async function loadSubmissionForEdit() {
+            const id = getQueryParam('id');
+            if (!id) { window.location.href = '../user/my-submissions.html'; return; }
+            
+            try {
+                const submission = await getSubmission(id);
+                if (submission.status !== 'needs_revision') {
+                    showError('Only submissions requesting revision can be edited');
+                    return;
+                }
+                
+                document.getElementById('type').value = submission.type;
+                document.getElementById('subject').value = submission.subject;
+                document.getElementById('body').value = submission.body;
+                document.getElementById('deadline').value = new Date(submission.deadline).toISOString().slice(0, 16);
+                
+                window.currentSubmission = submission;
+            } catch (error) {
+                showError('Failed to load submission: ' + error.message);
+            }
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            if (!window.currentSubmission) return;
+            
+            const subject = document.getElementById('subject').value.trim();
+            const body = document.getElementById('body').value.trim();
+            const deadline = document.getElementById('deadline').value;
+            
+            if (!subject || !body || !deadline) {
+                showError('Please fill all required fields');
+                return;
+            }
+            
+            try {
+                await resubmitAfterRevision(window.currentSubmission.id, {
+                    subject,
+                    body,
+                    deadline: new Date(deadline).toISOString()
+                });
+                
+                showSuccess('Submission resubmitted successfully!');
+                setTimeout(() => {
+                    window.location.href = '../user/submission-success.html?id=' + window.currentSubmission.id;
+                }, 1500);
+            } catch (error) {
+                showError('Failed to resubmit: ' + error.message);
+            }
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('success-msg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = '../auth/login.html';
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - University Email Announcement Portal</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-tertiary);
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .admin-header h1 {
+            color: white;
+            margin: 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid;
+        }
+
+        .stat-card.urgent {
+            border-left-color: var(--danger-color);
+        }
+
+        .stat-card.high {
+            border-left-color: var(--warning-color);
+        }
+
+        .stat-card.pending {
+            border-left-color: var(--info-color);
+        }
+
+        .stat-card.approved {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submissions-section {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .sort-buttons .btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: var(--font-size-sm);
+        }
+
+        .submissions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .submission-item {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .submission-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .submission-item:last-child {
+            border-bottom: none;
+        }
+
+        .submission-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .submission-item-title {
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+        }
+
+        .submission-item-meta {
+            display: flex;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .submission-item-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .submission-item-actions .btn {
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-size-xs);
+        }
+
+        .priority-badge {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .priority-urgent {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .priority-high {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-medium {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .priority-normal {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-3xl) var(--spacing-lg);
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                Announcement Portal (Admin)
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link active">Dashboard</a></li>
+                <li><a href="all-submissions.html" class="navbar-link">All Submissions</a></li>
+                <li><a href="approved.html" class="navbar-link">Approved</a></li>
+                <li><a href="settings.html" class="navbar-link">Settings</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="container">
+            <h1>Admin Dashboard</h1>
+            <p style="margin: var(--spacing-md) 0 0 0; opacity: 0.9;">Review and approve announcements</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding: var(--spacing-xl);">
+        <div class="container">
+            <!-- Stats Grid -->
+            <div class="dashboard-grid">
+                <div class="stat-card urgent">
+                    <div class="stat-number" id="stat-urgent">0</div>
+                    <div class="stat-label">Urgent</div>
+                </div>
+                <div class="stat-card high">
+                    <div class="stat-number" id="stat-high">0</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-number" id="stat-pending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card approved">
+                    <div class="stat-number" id="stat-approved">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+            </div>
+
+            <!-- Pending Submissions -->
+            <div class="submissions-section">
+                <div class="section-header">
+                    <h2 class="section-title">Pending Submissions</h2>
+                    <div class="sort-buttons">
+                        <button class="btn btn-primary" onclick="setSortBy('priority')">Sort by Priority</button>
+                        <button class="btn btn-secondary" onclick="setSortBy('date')">Sort by Date</button>
+                    </div>
+                </div>
+
+                <div id="submissions-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon"></div>
+                        <p style="color: var(--text-secondary);">Loading submissions...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/priority.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        // Protect this page - wait for auth check
+        protectPageAsAdmin().then((allowed) => {
+            if (allowed) {
+                loadDashboard();
+            }
+        });
+
+        let currentSortBy = 'priority';
+
+        async function loadDashboard() {
+            try {
+                // Get all submissions
+                const submissions = await getAllSubmissions();
+                
+                // Update stats
+                updateStats(submissions);
+                
+                // Display pending submissions
+                const pending = submissions.filter(s => s.status === 'pending');
+                displaySubmissions(pending);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateStats(submissions) {
+            const pending = submissions.filter(s => s.status === 'pending');
+            
+            document.getElementById('stat-urgent').textContent = 
+                pending.filter(s => s.priority === 'urgent').length;
+            document.getElementById('stat-high').textContent = 
+                pending.filter(s => s.priority === 'high').length;
+            document.getElementById('stat-pending').textContent = pending.length;
+            document.getElementById('stat-approved').textContent = 
+                submissions.filter(s => s.status === 'approved').length;
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissions-container');
+
+            if (submissions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"></div>
+                        <p style="color: var(--text-secondary);">No pending submissions. All caught up!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by preference
+            let sorted = submissions;
+            if (currentSortBy === 'priority') {
+                sorted = sortByPriority(submissions);
+            } else {
+                sorted = sortBySubmissionOrder(submissions);
+            }
+
+            const html = `
+                <ul class="submissions-list">
+                    ${sorted.map(sub => `
+                        <li class="submission-item" onclick="viewSubmission('${sub.id}')">
+                            <div class="submission-item-header">
+                                <div>
+                                    <div class="submission-item-title">${escapeHtml(sub.subject)}</div>
+                                </div>
+                                <span class="priority-badge priority-${sub.priority}">
+                                    ${getPriorityLabel(sub.priority)}
+                                </span>
+                            </div>
+                            <div class="submission-item-meta">
+                                <span>${sub.type}</span>
+                                <span>From: ${escapeHtml(sub.submittedBy)}</span>
+                                <span>${sub.department}</span>
+                                <span>Deadline: ${formatDate(sub.deadline)}</span>
+                            </div>
+                            <div class="submission-item-actions">
+                                <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); quickApprove('${sub.id}')">
+                                    Approve
+                                </button>
+                                <button class="btn btn-warning btn-sm" onclick="event.stopPropagation(); quickReview('${sub.id}')">
+                                    Review
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); quickReject('${sub.id}')">
+                                    Reject
+                                </button>
+                            </div>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function setSortBy(sortType) {
+            currentSortBy = sortType;
+            loadDashboard();
+        }
+
+        function viewSubmission(id) {
+            window.location.href = `review-submission.html?id=${id}`;
+        }
+
+        function quickApprove(id) {
+            if (confirm('Approve this submission?')) {
+                approveSubmission(id).then(() => {
+                    loadDashboard();
+                });
+            }
+        }
+
+        function quickReview(id) {
+            window.location.href = `review-submission.html?id=${id}`;
+        }
+
+        function quickReject(id) {
+            const reason = prompt('Enter rejection reason:');
+            if (reason) {
+                rejectSubmission(id, reason).then(() => {
+                    loadDashboard();
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+
+        // Load on page load
+        loadDashboard();
+    </script>
+</body>
+</html>

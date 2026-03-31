@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - University Email Announcement Portal</title>
+    
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body { background-color: var(--bg-tertiary); }
+        .page-header { background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: var(--spacing-lg); }
+        .page-content { padding: var(--spacing-lg); }
+        .settings-section { background-color: white; border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); border: 1px solid var(--border-color); }
+        .settings-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-md); border-bottom: 2px solid var(--primary-color); padding-bottom: var(--spacing-md); }
+        .type-list, .admin-list { list-style: none; padding: 0; }
+        .type-item, .admin-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: var(--spacing-md); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); 
+            margin-bottom: var(--spacing-sm); 
+        }
+        .type-list button, .admin-list button { margin-left: var(--spacing-sm); }
+        .form-group { margin-bottom: var(--spacing-lg); }
+        .form-label { display: block; margin-bottom: var(--spacing-sm); font-weight: var(--font-weight-bold); }
+        .form-input, .form-textarea { width: 100%; padding: var(--spacing-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; }
+        .modal-content { background: white; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; border-radius: var(--radius-lg); padding: var(--spacing-lg); width: 90%; max-width: 400px; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); }
+        .modal-header { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-md); }
+        .modal-buttons { display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                Announcement Portal (Admin)
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><a href="all-submissions.html" class="navbar-link">All Submissions</a></li>
+                <li><a href="approved.html" class="navbar-link">Approved</a></li>
+                <li><a href="settings.html" class="navbar-link active">Settings</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Settings</h1>
+        <p style="color: var(--text-secondary);">Manage announcement types and admin accounts</p>
+    </div>
+
+    <div class="page-content">
+        <div class="settings-section">
+            <div class="settings-title">Announcement Types</div>
+            <div style="margin-bottom: var(--spacing-lg);">
+                <button class="btn btn-primary" onclick="openTypeModal()" style="width: 100%; margin-bottom: var(--spacing-md);">+ Add New Type</button>
+                <ul class="type-list" id="types-list"></ul>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-title">👥 Admin Accounts</div>
+            <div style="margin-bottom: var(--spacing-lg);">
+                <button class="btn btn-primary" onclick="openAdminModal()" style="width: 100%; margin-bottom: var(--spacing-md);">+ Add Admin</button>
+                <ul class="admin-list" id="admins-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Type Modal -->
+    <div class="modal-backdrop" id="type-modal">
+        <div class="modal-content">
+            <div class="modal-header">Add Announcement Type</div>
+            <form onsubmit="handleAddType(event)">
+                <div class="form-group">
+                    <label class="form-label">Type Name</label>
+                    <input type="text" id="type-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="type-desc" class="form-textarea" required></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeTypeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div class="modal-backdrop" id="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">Add Admin Account</div>
+            <form onsubmit="handleAddAdmin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="admin-email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="admin-name" class="form-input" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        const DEFAULT_TYPES = [
+            { name: 'General', description: 'General announcements' },
+            { name: 'Academic', description: 'Academic announcements and updates' },
+            { name: 'Event', description: 'Campus events and activities' },
+            { name: 'Urgent', description: 'Urgent and important notices' },
+            { name: 'Club', description: 'Club and organization announcements' },
+            { name: 'Job', description: 'Job opportunities and internships' }
+        ];
+
+        protectPageAsAdmin().then((allowed) => {
+            if (allowed) loadSettings();
+        });
+
+        async function loadSettings() {
+            try {
+                await loadTypes();
+                await loadAdmins();
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function loadTypes() {
+            try {
+                const db = firebase.firestore();
+                const typesRef = db.collection('announcement_types');
+                const snapshot = await typesRef.get();
+                
+                let types = [];
+                if (snapshot.empty) {
+                    // Initialize with default types
+                    for (let type of DEFAULT_TYPES) {
+                        await typesRef.add(type);
+                    }
+                    types = DEFAULT_TYPES;
+                } else {
+                    types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }
+                
+                displayTypes(types);
+            } catch (error) {
+                console.error('Error loading types:', error);
+            }
+        }
+
+        async function loadAdmins() {
+            try {
+                const db = firebase.firestore();
+                const admins = [];
+                const usersRef = db.collection('users');
+                const snapshot = await usersRef.where('role', '==', 'admin').get();
+                
+                snapshot.forEach(doc => {
+                    admins.push({ id: doc.id, email: doc.id, ...doc.data() });
+                });
+                
+                displayAdmins(admins);
+            } catch (error) {
+                console.error('Error loading admins:', error);
+            }
+        }
+
+        function displayTypes(types) {
+            const list = document.getElementById('types-list');
+            list.innerHTML = types.map(t => `
+                <li class="type-item">
+                    <div>
+                        <strong>${t.name}</strong>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: var(--font-size-sm);">${t.description || ''}</p>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="deleteType('${t.id}')">Delete</button>
+                </li>
+            `).join('');
+        }
+
+        function displayAdmins(admins) {
+            const list = document.getElementById('admins-list');
+            list.innerHTML = admins.map(a => `
+                <li class="admin-item">
+                    <div>
+                        <strong>${a.name || 'Unknown'}</strong>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: var(--font-size-sm);">${a.email}</p>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="deleteAdmin('${a.id}')">Remove</button>
+                </li>
+            `).join('');
+        }
+
+        function openTypeModal() {
+            document.getElementById('type-modal').style.display = 'block';
+        }
+
+        function closeTypeModal() {
+            document.getElementById('type-modal').style.display = 'none';
+            document.getElementById('type-name').value = '';
+            document.getElementById('type-desc').value = '';
+        }
+
+        async function handleAddType(event) {
+            event.preventDefault();
+            try {
+                const name = document.getElementById('type-name').value;
+                const desc = document.getElementById('type-desc').value;
+                
+                const db = firebase.firestore();
+                await db.collection('announcement_types').add({
+                    name: name,
+                    description: desc
+                });
+                
+                showMessage('Type added successfully', 'success');
+                closeTypeModal();
+                await loadTypes();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteType(typeId) {
+            if (!confirm('Delete this type?')) return;
+            try {
+                const db = firebase.firestore();
+                await db.collection('announcement_types').doc(typeId).delete();
+                showMessage('Type deleted', 'success');
+                await loadTypes();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        function openAdminModal() {
+            document.getElementById('admin-modal').style.display = 'block';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').style.display = 'none';
+            document.getElementById('admin-email').value = '';
+            document.getElementById('admin-name').value = '';
+        }
+
+        async function handleAddAdmin(event) {
+            event.preventDefault();
+            try {
+                const email = document.getElementById('admin-email').value;
+                const name = document.getElementById('admin-name').value;
+                
+                // Create Firebase Auth account
+                const userCred = await firebase.auth().createUserWithEmailAndPassword(email, 'TempPassword123!');
+                
+                // Create user profile in Firestore
+                const db = firebase.firestore();
+                await db.collection('users').doc(userCred.user.uid).set({
+                    email: email,
+                    name: name,
+                    role: 'admin',
+                    createdAt: new Date()
+                });
+                
+                showMessage('Admin account created successfully', 'success');
+                closeAdminModal();
+                await loadAdmins();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteAdmin(userId) {
+            if (!confirm('Remove this admin?')) return;
+            try {
+                const db = firebase.firestore();
+                await db.collection('users').doc(userId).update({ role: 'faculty' });
+                showMessage('Admin removed', 'success');
+                await loadAdmins();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+
+        function showMessage(message, type) {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = 'var(--spacing-lg)';
+            div.style.right = 'var(--spacing-lg)';
+            div.style.zIndex = '999';
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

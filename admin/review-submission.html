@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Submission - University Email Announcement Portal</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-tertiary);
+        }
+
+        .page-header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .page-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        .submission-section {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .submission-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .meta-item {
+            border: 1px solid var(--border-color);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+        }
+
+        .meta-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .meta-value {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .submission-content {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .content-label {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+            text-transform: uppercase;
+        }
+
+        .content-text {
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+        }
+
+        .file-section {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: white;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .feedback-form {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-label {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .btn-approve {
+            background-color: var(--success-color);
+            color: white;
+            padding: var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-approve:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-reject {
+            background-color: var(--danger-color);
+            color: white;
+            padding: var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-reject:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-revise {
+            background-color: var(--warning-color);
+            color: white;
+            padding: var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-revise:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .success-message {
+            background-color: #d1fae5;
+            border: 1px solid var(--success-color);
+            color: #065f46;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .error-message {
+            background-color: #fee2e2;
+            border: 1px solid var(--danger-color);
+            color: #991b1b;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: var(--spacing-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .priority-urgent {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .priority-high {
+            background-color: #fed7aa;
+            color: #92400e;
+        }
+
+        .priority-medium {
+            background-color: #fef08a;
+            color: #713f12;
+        }
+
+        .priority-normal {
+            background-color: #dbeafe;
+            color: #0c2d6b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                Announcement Portal (Admin)
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><a href="all-submissions.html" class="navbar-link">All Submissions</a></li>
+                <li><a href="approved.html" class="navbar-link">Approved</a></li>
+                <li><a href="settings.html" class="navbar-link">Settings</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Review Submission</h1>
+        <p style="color: var(--text-secondary);">Review and approve or reject announcement submissions</p>
+    </div>
+
+    <div class="page-content">
+        <div class="success-message" id="success-message"></div>
+        <div class="error-message" id="error-message"></div>
+
+        <!-- Submission Details -->
+        <div class="submission-section">
+            <div class="section-title">Submission Details</div>
+            
+            <div class="submission-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Submission ID</div>
+                    <div class="meta-value" id="submission-id">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Submitted By</div>
+                    <div class="meta-value" id="submitted-by">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Department</div>
+                    <div class="meta-value" id="department">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Submitted On</div>
+                    <div class="meta-value" id="submitted-date">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Announcement Type</div>
+                    <div class="meta-value" id="announcement-type">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Priority</div>
+                    <div class="meta-value" id="priority-badge">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Deadline</div>
+                    <div class="meta-value" id="deadline">-</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Current Status</div>
+                    <div class="meta-value" id="current-status">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject -->
+        <div class="submission-section">
+            <div class="section-title">Subject</div>
+            <div class="meta-value" id="submission-subject" style="font-size: var(--font-size-lg);">-</div>
+        </div>
+
+        <!-- Content -->
+        <div class="submission-section">
+            <div class="section-title">Content</div>
+            <div class="submission-content">
+                <div class="content-label">Message Body</div>
+                <div class="content-text" id="submission-body">-</div>
+            </div>
+        </div>
+
+        <!-- File Attachment -->
+        <div class="submission-section" id="file-section" style="display: none;">
+            <div class="section-title">Attachment</div>
+            <div class="file-section">
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-icon"></div>
+                        <div class="file-details">
+                            <div class="file-name" id="file-name">-</div>
+                        </div>
+                    </div>
+                    <a href="#" id="file-download" class="btn btn-secondary" style="text-decoration: none;">Download</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="submission-section">
+            <div class="section-title">Review & Decision</div>
+            
+            <div class="feedback-form">
+                <div class="form-group">
+                    <label class="form-label">Feedback / Comments (Optional)</label>
+                    <textarea 
+                        id="feedback" 
+                        class="form-control" 
+                        rows="5"
+                        placeholder="Provide feedback to the submitter..."></textarea>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-approve" onclick="approveSubmission()">
+                        <span class="loading-spinner"></span>
+                        <span class="btn-text">Approve</span>
+                    </button>
+                    <button class="btn-revise" onclick="requestRevisionDialog()">
+                        <span class="loading-spinner"></span>
+                        <span class="btn-text">Request Revision</span>
+                    </button>
+                    <button class="btn-reject" onclick="rejectSubmissionDialog()">
+                        <span class="loading-spinner"></span>
+                        <span class="btn-text">Reject</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- App Scripts -->
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/priority.js"></script>
+    <script src="../assets/js/storage.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        // Protect page - wait for auth check
+        protectPageAsAdmin().then((allowed) => {
+            if (allowed) {
+                loadSubmissionForReview();
+            }
+        });
+
+        async function loadSubmissionForReview() {
+            try {
+                const submissionId = getQueryParam('id');
+                if (!submissionId) {
+                    showError('No submission ID provided');
+                    return;
+                }
+
+                const submission = await getSubmission(submissionId);
+                if (!submission) {
+                    showError('Submission not found');
+                    return;
+                }
+
+                displaySubmissionDetails(submission);
+            } catch (error) {
+                console.error('Error loading submission:', error);
+                showError('Failed to load submission: ' + error.message);
+            }
+        }
+
+        function displaySubmissionDetails(submission) {
+            document.getElementById('submission-id').textContent = submission.id;
+            document.getElementById('submitted-by').textContent = submission.submitterEmail;
+            document.getElementById('department').textContent = submission.department || '-';
+            document.getElementById('submitted-date').textContent = formatDateTime(submission.submittedAt);
+            document.getElementById('announcement-type').textContent = submission.type;
+            document.getElementById('deadline').textContent = formatDate(submission.deadline);
+            document.getElementById('current-status').textContent = submission.status;
+            document.getElementById('submission-subject').textContent = submission.subject;
+            document.getElementById('submission-body').textContent = submission.body;
+
+            // Priority Badge
+            const priority = calculatePriority(submission);
+            const badgeClass = getPriorityBadgeClass(priority.priority);
+            document.getElementById('priority-badge').innerHTML = 
+                `<span class="priority-badge ${badgeClass}">${getPriorityLabel(priority.priority)}</span>`;
+
+            // File
+            if (submission.documentUrl && submission.fileName) {
+                document.getElementById('file-section').style.display = 'block';
+                document.getElementById('file-name').textContent = submission.fileName;
+                document.getElementById('file-download').href = submission.documentUrl;
+            }
+
+            // Store submission for actions
+            window.currentSubmission = submission;
+        }
+
+        function approveSubmission() {
+            if (!window.currentSubmission) return;
+            
+            const feedback = document.getElementById('feedback').value.trim();
+            setButtonLoading(event.target, true);
+
+            approveSubmission_API(window.currentSubmission.id, feedback)
+                .then(() => {
+                    showSuccess('Submission approved successfully!');
+                    setTimeout(() => {
+                        window.location.href = '../admin/dashboard.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    setButtonLoading(event.target, false);
+                    showError('Failed to approve: ' + error.message);
+                });
+        }
+
+        function requestRevisionDialog() {
+            const feedback = document.getElementById('feedback').value.trim();
+            if (!feedback) {
+                showError('Please provide feedback for revision request');
+                return;
+            }
+
+            if (!window.currentSubmission) return;
+            setButtonLoading(event.target, true);
+
+            requestRevision(window.currentSubmission.id, feedback)
+                .then(() => {
+                    showSuccess('Revision request sent to submitter!');
+                    setTimeout(() => {
+                        window.location.href = '../admin/dashboard.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    setButtonLoading(event.target, false);
+                    showError('Failed to request revision: ' + error.message);
+                });
+        }
+
+        function rejectSubmissionDialog() {
+            const feedback = document.getElementById('feedback').value.trim();
+            if (!feedback) {
+                showError('Please provide a reason for rejection');
+                return;
+            }
+
+            if (!window.currentSubmission) return;
+            setButtonLoading(event.target, true);
+
+            rejectSubmission(window.currentSubmission.id, feedback)
+                .then(() => {
+                    showSuccess('Submission rejected!');
+                    setTimeout(() => {
+                        window.location.href = '../admin/dashboard.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    setButtonLoading(event.target, false);
+                    showError('Failed to reject: ' + error.message);
+                });
+        }
+
+        function showSuccess(message) {
+            const element = document.getElementById('success-message');
+            element.textContent = message;
+            element.classList.add('show');
+            setTimeout(() => element.classList.remove('show'), 4000);
+        }
+
+        function showError(message) {
+            const element = document.getElementById('error-message');
+            element.textContent = message;
+            element.classList.add('show');
+            setTimeout(() => element.classList.remove('show'), 4000);
+        }
+
+        function setButtonLoading(button, isLoading) {
+            if (!button) return;
+            button.disabled = isLoading;
+            if (isLoading) {
+                button.classList.add('loading');
+            } else {
+                button.classList.remove('loading');
+            }
+        }
+
+        // Helper function - copy of approveSubmission name (avoid conflict)
+        async function approveSubmission_API(submissionId, feedback) {
+            return updateSubmission(submissionId, {
+                status: 'approved',
+                feedback: feedback || '',
+                reviewedAt: new Date().toISOString()
+            });
+        }
+
+        function logout() {
+            logoutUser();
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

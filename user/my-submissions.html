@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Submissions - University Email Announcement Portal</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-tertiary);
+        }
+
+        .filter-bar {
+            background-color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .filter-group label {
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-sm);
+        }
+
+        .filter-group select {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        .submissions-table {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .submissions-table tbody tr {
+            cursor: pointer;
+            transition: background-color var(--transition-fast);
+        }
+
+        .submissions-table tbody tr:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .submission-row-click {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .status-badge {
+            font-weight: var(--font-weight-semibold);
+            padding: var(--spacing-xs) var(--spacing-md);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-3xl) var(--spacing-lg);
+            background-color: white;
+            border-radius: var(--radius-lg);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .action-btn {
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-size-xs);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .action-btn-view {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .action-btn-view:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn-edit {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .action-btn-edit:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                University Announcement Portal
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link">Dashboard</a></li>
+                <li><a href="my-submissions.html" class="navbar-link active">My Submissions</a></li>
+                <li><a href="profile.html" class="navbar-link">Profile</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div style="padding: var(--spacing-lg);">
+        <div class="container">
+            <h1 style="margin-bottom: var(--spacing-lg);">My Submissions</h1>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="filter-status">Status:</label>
+                    <select id="filter-status" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="needs_revision">Needs Revision</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-type">Type:</label>
+                    <select id="filter-type" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="General Announcement">General Announcement</option>
+                        <option value="Academic Notice">Academic Notice</option>
+                        <option value="Event Invitation">Event Invitation</option>
+                        <option value="Urgent Notice">Urgent Notice</option>
+                        <option value="Club / Activity">Club / Activity</option>
+                        <option value="Job / Opportunity">Job / Opportunity</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary" onclick="loadSubmissions()" style="margin-left: auto;">
+                    Refresh
+                </button>
+            </div>
+
+            <!-- Submissions Table -->
+            <div id="submissions-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon">NO DATA</div>
+                    <h3 class="empty-state-title">Loading your submissions...</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        // Protect this page - wait for auth check
+        protectPageAsFaculty().then((allowed) => {
+            if (allowed) {
+                loadSubmissions();
+            }
+        });
+
+        async function loadSubmissions() {
+            try {
+                const submissions = await getUserSubmissions();
+                displaySubmissions(submissions);
+            } catch (error) {
+                console.error('Error loading submissions:', error);
+            }
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissions-container');
+
+            if (submissions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"></div>
+                        <h3 class="empty-state-title">No submissions yet</h3>
+                        <p style="color: var(--text-secondary);">Create your first announcement from the dashboard</p>
+                        <a href="dashboard.html" class="btn btn-primary" style="margin-top: var(--spacing-lg);">Go to Dashboard</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = `
+                <div class="submissions-table">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Type</th>
+                                    <th>Submitted</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${submissions.map(sub => `
+                                    <tr>
+                                        <td><strong>${escapeHtml(sub.subject)}</strong></td>
+                                        <td>${sub.type}</td>
+                                        <td>${formatDate(sub.submittedAt)}</td>
+                                        <td>${formatDate(sub.deadline)}</td>
+                                        <td>
+                                            <span class="badge ${getStatusBadgeClass(sub.status)}">
+                                                ${sub.status}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn action-btn-view" onclick="viewSubmission('${sub.id}')">
+                                                    View
+                                                </button>
+                                                ${sub.status === 'needs_revision' ? `
+                                                    <button class="action-btn action-btn-edit" onclick="editSubmission('${sub.id}')">
+                                                        Edit
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'pending': 'badge-warning',
+                'approved': 'badge-success',
+                'rejected': 'badge-danger',
+                'needs_revision': 'badge-warning'
+            };
+            return classes[status] || 'badge-primary';
+        }
+
+        function applyFilters() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            // This would filter locally - in production, you'd filter in Firestore query
+            loadSubmissions();
+        }
+
+        function viewSubmission(id) {
+            window.location.href = `submission-detail.html?id=${id}`;
+        }
+
+        function editSubmission(id) {
+            window.location.href = `edit-submission.html?id=${id}`;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+
+        // Load submissions on page load
+        loadSubmissions();
+    </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - University Email Announcement Portal</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <style>
+        body {
+            background-color: var(--bg-tertiary);
+        }
+
+        .dashboard-header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-lg);
+        }
+
+        .dashboard-content {
+            padding: var(--spacing-lg);
+        }
+
+        .announcement-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .announcement-card {
+            background-color: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .announcement-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .announcement-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .announcement-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .announcement-desc {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .recent-section {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-2xl);
+        }
+
+        .recent-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .recent-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .recent-item {
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-item-title {
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        .recent-item-status {
+            font-size: var(--font-size-sm);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-3xl) var(--spacing-lg);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                University Announcement Portal
+            </a>
+            <ul class="navbar-menu" id="navbar-menu">
+                <li><a href="dashboard.html" class="navbar-link active">Dashboard</a></li>
+                <li><a href="my-submissions.html" class="navbar-link">My Submissions</a></li>
+                <li><a href="profile.html" class="navbar-link">Profile</a></li>
+                <li><a href="#" onclick="logoutUser(); return false;" class="navbar-link">Logout</a></li>
+            </ul>
+            <button class="navbar-toggle" onclick="toggleMenu()" style="display: none;">Menu</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-header">
+        <div class="container">
+            <h1>Welcome, <span id="user-name">User</span>!</h1>
+            <p>Create and submit announcements for approval</p>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="container">
+            <!-- Quick Stats -->
+            <div class="quick-stats" id="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-pending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-approved">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-revision">0</div>
+                    <div class="stat-label">Needs Revision</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-rejected">0</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            </div>
+
+            <!-- Announcement Types -->
+            <h2>New Announcement</h2>
+            <div class="announcement-types">
+                <div class="announcement-card" onclick="goToNewSubmission('General Announcement')">
+                    <div class="announcement-icon"></div>
+                    <div class="announcement-title">General Announcement</div>
+                    <div class="announcement-desc">Campus-wide announcements and news</div>
+                </div>
+                <div class="announcement-card" onclick="goToNewSubmission('Academic Notice')">
+                    <div class="announcement-icon"></div>
+                    <div class="announcement-title">Academic Notice</div>
+                    <div class="announcement-desc">Class cancellations, deadline changes</div>
+                </div>
+                <div class="announcement-card" onclick="goToNewSubmission('Event Invitation')">
+                    <div class="announcement-icon"></div>
+                    <div class="announcement-title">Event Invitation</div>
+                    <div class="announcement-desc">Webinars, conferences, workshops</div>
+                </div>
+                <div class="announcement-card" onclick="goToNewSubmission('Urgent Notice')">
+                    <div class="announcement-icon"></div>
+                    <div class="announcement-title">Urgent Notice</div>
+                    <div class="announcement-desc">Emergency evacuations, closures</div>
+                </div>
+                <div class="announcement-card" onclick="goToNewSubmission('Club / Activity')">
+                    <div class="announcement-icon"></div>
+                    <div class="announcement-title">Club / Activity</div>
+                    <div class="announcement-desc">Club meetings, team activities</div>
+                </div>
+                <div class="announcement-card" onclick="goToNewSubmission('Job / Opportunity')">
+                    <div class="announcement-icon"></div>
+                    <div class="announcement-title">Job / Opportunity</div>
+                    <div class="announcement-desc">Career fairs, internships, jobs</div>
+                </div>
+            </div>
+
+            <!-- Recent Submissions -->
+            <div class="recent-section">
+                <h3 class="recent-title">Your Recent Submissions</h3>
+                <div id="recent-submissions">
+                    <div class="empty-state">
+                        <p style="color: var(--text-secondary);">No submissions yet. Create your first announcement!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/guard.js"></script>
+    <script src="../assets/js/submissions.js"></script>
+    <script src="../assets/js/priority.js"></script>
+    <script src="../assets/js/utils.js"></script>
+
+    <script>
+        // Protect this page - wait for auth check
+        protectPageAsFaculty().then((allowed) => {
+            if (allowed) {
+                loadDashboard();
+            }
+        });
+
+        // Load user data
+        async function loadDashboard() {
+            try {
+                // Get user profile
+                const profile = await getUserProfile();
+                document.getElementById('user-name').textContent = profile.name || 'User';
+
+                // Get user submissions
+                const submissions = await getUserSubmissions();
+                
+                // Update stats
+                updateStats(submissions);
+                
+                // Show recent submissions
+                displayRecentSubmissions(submissions);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateStats(submissions) {
+            document.getElementById('stat-pending').textContent = 
+                submissions.filter(s => s.status === 'pending').length;
+            document.getElementById('stat-approved').textContent = 
+                submissions.filter(s => s.status === 'approved').length;
+            document.getElementById('stat-revision').textContent = 
+                submissions.filter(s => s.status === 'needs_revision').length;
+            document.getElementById('stat-rejected').textContent = 
+                submissions.filter(s => s.status === 'rejected').length;
+        }
+
+        function displayRecentSubmissions(submissions) {
+            const container = document.getElementById('recent-submissions');
+            const recent = submissions.slice(0, 5);
+
+            if (recent.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p style="color: var(--text-secondary);">No submissions yet. Create your first announcement!</p></div>';
+                return;
+            }
+
+            const html = recent.map(sub => `
+                <div class="recent-item">
+                    <div>
+                        <div class="recent-item-title">${sub.subject}</div>
+                        <div style="font-size: var(--font-size-xs); color: var(--text-tertiary);">${formatDate(sub.submittedAt)}</div>
+                    </div>
+                    <div class="recent-item-status">
+                        <span class="badge ${getBadgeClass(sub.status)}">${sub.status}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = '<ul class="recent-list">' + html + '</ul>';
+        }
+
+        function getBadgeClass(status) {
+            const classes = {
+                'pending': 'badge-warning',
+                'approved': 'badge-success',
+                'rejected': 'badge-danger',
+                'needs_revision': 'badge-warning'
+            };
+            return classes[status] || 'badge-primary';
+        }
+
+        function goToNewSubmission(type) {
+            window.location.href = `new-submission.html?type=${encodeURIComponent(type)}`;
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+
+        // Listen for auth changes
+        window.addEventListener('authStateChanged', loadDashboard);
+        
+        // Initial load
+        loadDashboard();
+    </script>
+</body>
+</html>
