@@ -2,8 +2,6 @@
    REUSABLE COMPONENTS
    ============================================ */
 
-@import url('variables.css');
-
 /* BUTTONS - Material Design */
 .btn {
     display: inline-block;

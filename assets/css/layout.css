@@ -2,8 +2,6 @@
    LAYOUT COMPONENTS
    ============================================ */
 
-@import url('variables.css');
-
 /* NAVBAR - Material Design */
 .navbar {
     background-color: var(--bg-primary);
