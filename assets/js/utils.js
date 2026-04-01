@@ -297,7 +297,7 @@ function ensureConsistentNavigation() {
     if (existingBrand && existingBrand.tagName !== 'A') {
         const brandLink = document.createElement('a');
         brandLink.className = existingBrand.className;
-        brandLink.href = '/index.html';
+        brandLink.href = '/media-website/index.html';
         brandLink.textContent = existingBrand.textContent.trim() || 'University Announcement Portal';
         existingBrand.replaceWith(brandLink);
     } else if (existingBrand && !existingBrand.getAttribute('href')) {
@@ -309,7 +309,7 @@ function ensureConsistentNavigation() {
     if (menu && !menu.querySelector('[data-home-link="true"]')) {
         const li = document.createElement('li');
         const link = document.createElement('a');
-        link.href = '/index.html';
+        link.href = '/media-website/index.html';
         link.className = 'navbar-link';
         link.textContent = 'Home';
         link.setAttribute('data-home-link', 'true');
