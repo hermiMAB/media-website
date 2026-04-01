@@ -66,13 +66,36 @@ async function loadFirebaseConfig() {
     }
 
     try {
-        const response = await fetch('./assets/js/firebase-runtime-config.json', { cache: 'no-store' });
-        if (!response.ok) return false;
+        // Determine correct path based on current page location
+        const pathname = window.location.pathname;
+        let configPath = './assets/js/firebase-runtime-config.json';
+        
+        // If in a subdirectory (auth/, user/, admin/), go up one level
+        if (pathname.includes('/auth/') || pathname.includes('/user/') || pathname.includes('/admin/')) {
+            configPath = '../assets/js/firebase-runtime-config.json';
+        }
+        
+        console.log('[loadFirebaseConfig] Current path:', pathname);
+        console.log('[loadFirebaseConfig] Fetching from:', configPath);
+        
+        const response = await fetch(configPath, { cache: 'no-store' });
+        if (!response.ok) {
+            console.error('[loadFirebaseConfig] Fetch failed:', response.status, response.statusText);
+            return false;
+        }
         const parsed = await response.json();
-        if (!parsed || !parsed.apiKey || !parsed.projectId) return false;
+        if (!parsed || !parsed.apiKey || !parsed.projectId) {
+            console.error('[loadFirebaseConfig] Config invalid - missing apiKey or projectId');
+            return false;
+        }
         firebaseConfig = parsed;
+        console.log('[loadFirebaseConfig] Config loaded successfully');
         return true;
     } catch (error) {
+        console.error('[loadFirebaseConfig] Runtime Firebase config not found:', error.message);
+        return false;
+    }
+}
         console.warn('Runtime Firebase config not found:', error.message);
         return false;
     }
