@@ -66,7 +66,7 @@ async function loadFirebaseConfig() {
     }
 
     try {
-        const response = await fetch('/assets/js/firebase-runtime-config.json', { cache: 'no-store' });
+        const response = await fetch('./assets/js/firebase-runtime-config.json', { cache: 'no-store' });
         if (!response.ok) return false;
         const parsed = await response.json();
         if (!parsed || !parsed.apiKey || !parsed.projectId) return false;
