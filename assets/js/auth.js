@@ -56,11 +56,7 @@ async function logoutUser() {
         userRole = null;
 
         // Redirect to login page
-        if (window.location.pathname.includes('/media-website/')) {
-            window.location.href = './auth/login.html';
-        } else {
-            window.location.href = './auth/login.html';
-        }
+        window.location.href = '/media-website/auth/login.html';
 
         return true;
     } catch (error) {
