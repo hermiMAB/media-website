@@ -292,16 +292,16 @@ function ensureConsistentNavigation() {
     const navbar = document.querySelector('.navbar');
     if (!navbar) return;
 
-    // Ensure brand always links to home
+    // Force brand to always link to LOGIN PAGE
     const existingBrand = navbar.querySelector('.navbar-brand');
     if (existingBrand && existingBrand.tagName !== 'A') {
         const brandLink = document.createElement('a');
         brandLink.className = existingBrand.className;
-        brandLink.href = '/media-website/index.html';
-        brandLink.textContent = existingBrand.textContent.trim() || 'University Announcement Portal';
+        brandLink.href = '/media-website/auth/login.html';
+        brandLink.textContent = existingBrand.textContent.trim() || 'Media Website';
         existingBrand.replaceWith(brandLink);
-    } else if (existingBrand && !existingBrand.getAttribute('href')) {
-        existingBrand.setAttribute('href', '/index.html');
+    } else if (existingBrand) {
+        existingBrand.setAttribute('href', '/media-website/auth/login.html');
     }
 
     // Add Home link to menu-style navbars if missing
@@ -309,7 +309,7 @@ function ensureConsistentNavigation() {
     if (menu && !menu.querySelector('[data-home-link="true"]')) {
         const li = document.createElement('li');
         const link = document.createElement('a');
-        link.href = '/media-website/index.html';
+        link.href = '/media-website/auth/login.html';
         link.className = 'navbar-link';
         link.textContent = 'Home';
         link.setAttribute('data-home-link', 'true');
@@ -323,16 +323,15 @@ function ensureConsistentNavigation() {
         const navbarContainer = navbar.querySelector('.navbar-container') || navbar.querySelector('.navbar-content');
 
         if (!adminMenu && navbarContainer) {
-            // Create a standard admin menu when missing
             adminMenu = document.createElement('ul');
             adminMenu.className = 'navbar-menu';
             adminMenu.id = 'navbar-menu';
 
             const links = [
-                { href: '/admin/dashboard.html', label: 'Dashboard' },
-                { href: '/admin/all-submissions.html', label: 'All Submissions' },
-                { href: '/admin/approved.html', label: 'Approved' },
-                { href: '/admin/settings.html', label: 'Settings' }
+                { href: '/media-website/admin/dashboard.html', label: 'Dashboard' },
+                { href: '/media-website/admin/all-submissions.html', label: 'All Submissions' },
+                { href: '/media-website/admin/approved.html', label: 'Approved' },
+                { href: '/media-website/admin/settings.html', label: 'Settings' }
             ];
 
             links.forEach((item) => {
@@ -341,9 +340,6 @@ function ensureConsistentNavigation() {
                 a.href = item.href;
                 a.className = 'navbar-link';
                 a.textContent = item.label;
-                if (window.location.pathname.endsWith(item.href.replace('/admin/', ''))) {
-                    a.classList.add('active');
-                }
                 li.appendChild(a);
                 adminMenu.appendChild(li);
             });
