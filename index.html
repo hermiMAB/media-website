@@ -44,22 +44,22 @@
 
             if (!user) {
                 // Not logged in → go to login
-                window.location.href = '/auth/login.html';
+                window.location.href = './auth/login.html';
                 return;
             }
 
             // Logged in → go to correct dashboard
             if (role === 'admin') {
-                window.location.href = '/admin/dashboard.html';
+                window.location.href = './admin/dashboard.html';
             } else {
-                window.location.href = '/user/dashboard.html';
+                window.location.href = './user/dashboard.html';
             }
         });
 
         // Safety fallback — if authStateChanged never fires after 6 seconds
         setTimeout(() => {
             console.warn('Auth timeout — redirecting to login');
-            window.location.href = '/auth/login.html';
+            window.location.href = './auth/login.html';
         }, 6000);
     </script>
 </body>
