@@ -9,7 +9,7 @@
 async function loginUser(email, password) {
     try {
         const result = await auth.signInWithEmailAndPassword(email, password);
-        console.log('Login successful:', result.user.email);
+        console.log('✓ Login successful:', result.user.email);
         return result;
     } catch (error) {
         console.error('✗ Login error:', error.message);
@@ -23,21 +23,19 @@ async function loginUser(email, password) {
 
 async function registerUser(email, password, userData) {
     try {
-        // Create auth user
         const result = await auth.createUserWithEmailAndPassword(email, password);
         const uid = result.user.uid;
-        
-        // Store user data in Firestore
+
         await db.collection('users').doc(uid).set({
             name: userData.name || email.split('@')[0],
             email: email,
             department: userData.department || '',
-            role: userData.role || 'faculty', // Default role
+            role: userData.role || 'faculty',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         });
-        
-        console.log('Registration successful:', email);
+
+        console.log('✓ Registration successful:', email);
         return result;
     } catch (error) {
         console.error('✗ Registration error:', error.message);
@@ -52,11 +50,14 @@ async function registerUser(email, password, userData) {
 async function logoutUser() {
     try {
         await auth.signOut();
-        console.log('Logout successful');
+        console.log('✓ Logout successful');
+
         currentUser = null;
         userRole = null;
-        // Always return user to login after sign-out
-        window.location.href = '/media-website/auth/login.html';
+
+        // Correct redirect for GitHub Pages
+        window.location.href = '/auth/login.html';
+
         return true;
     } catch (error) {
         console.error('✗ Logout error:', error.message);
@@ -71,7 +72,7 @@ async function logoutUser() {
 async function sendPasswordResetEmail(email) {
     try {
         await auth.sendPasswordResetEmail(email);
-        console.log('Password reset email sent to:', email);
+        console.log('✓ Password reset email sent to:', email);
         return true;
     } catch (error) {
         console.error('✗ Password reset error:', error.message);
@@ -87,17 +88,16 @@ async function changePassword(currentPassword, newPassword) {
     try {
         const user = auth.currentUser;
         if (!user) throw new Error('No user logged in');
-        
-        // Re-authenticate with current password
+
         const credential = firebase.auth.EmailAuthProvider.credential(
             user.email,
             currentPassword
         );
+
         await user.reauthenticateWithCredential(credential);
-        
-        // Update password
         await user.updatePassword(newPassword);
-        console.log('Password changed successfully');
+
+        console.log('✓ Password changed successfully');
         return true;
     } catch (error) {
         console.error('✗ Password change error:', error.message);
@@ -113,21 +113,19 @@ async function updateUserProfile(updates) {
     try {
         const user = auth.currentUser;
         if (!user) throw new Error('No user logged in');
-        
-        // Update Firestore user document
+
         await db.collection('users').doc(user.uid).update({
             ...updates,
             updatedAt: new Date().toISOString()
         });
-        
-        // Update Firebase Auth display name if provided
+
         if (updates.name) {
             await user.updateProfile({
                 displayName: updates.name
             });
         }
-        
-        console.log('Profile updated successfully');
+
+        console.log('✓ Profile updated successfully');
         return true;
     } catch (error) {
         console.error('✗ Profile update error:', error.message);
@@ -143,12 +141,10 @@ async function getUserProfile() {
     try {
         const user = auth.currentUser;
         if (!user) throw new Error('No user logged in');
-        
+
         const userDoc = await db.collection('users').doc(user.uid).get();
-        if (!userDoc.exists) {
-            throw new Error('User profile not found');
-        }
-        
+        if (!userDoc.exists) throw new Error('User profile not found');
+
         return {
             uid: user.uid,
             ...userDoc.data()
@@ -167,23 +163,21 @@ async function deleteUserAccount(password) {
     try {
         const user = auth.currentUser;
         if (!user) throw new Error('No user logged in');
-        
-        // Re-authenticate with password
+
         const credential = firebase.auth.EmailAuthProvider.credential(
             user.email,
             password
         );
+
         await user.reauthenticateWithCredential(credential);
-        
-        // Delete user document from Firestore
         await db.collection('users').doc(user.uid).delete();
-        
-        // Delete user from Firebase Auth
         await user.delete();
-        
-        console.log('Account deleted successfully');
+
+        console.log('✓ Account deleted successfully');
+
         currentUser = null;
         userRole = null;
+
         return true;
     } catch (error) {
         console.error('✗ Account deletion error:', error.message);
@@ -216,7 +210,6 @@ function getAuthCookie(key) {
 function deleteAuthCookie(key) {
     document.cookie = `${key}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 }
-
 
 // ============================================
 // ERROR MESSAGES
