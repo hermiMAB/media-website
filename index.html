@@ -4,38 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University Email Announcement Portal</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: sans-serif;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
+    <p>Loading...</p>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="assets/js/firebase-config.js"></script>
-    <script>
-        // Route users to the correct page from Home
-        function routeFromHome() {
-            if (typeof isAuthenticated !== 'function' || typeof getUserRole !== 'function') {
-                setTimeout(routeFromHome, 100);
-                return;
-            }
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-            const user = getCurrentUser ? getCurrentUser() : null;
+    <!-- App -->
+    <script src="assets/js/firebase-config.js"></script>
+
+    <script>
+        // Wait for authStateChanged then route
+        // This fires once Firebase resolves the user (logged in or not)
+        window.addEventListener('authStateChanged', function handler() {
+            window.removeEventListener('authStateChanged', handler); // run once only
+
+            const user = getCurrentUser();
             const role = getUserRole();
 
+            console.log('Index routing — user:', user?.email, '| role:', role);
+
             if (!user) {
+                // Not logged in → go to login
                 window.location.href = '/auth/login.html';
                 return;
             }
 
+            // Logged in → go to correct dashboard
             if (role === 'admin') {
                 window.location.href = '/admin/dashboard.html';
             } else {
                 window.location.href = '/user/dashboard.html';
             }
-        }
+        });
 
-        // Wait for auth observer result, then route
-        window.addEventListener('authStateChanged', routeFromHome);
-        setTimeout(routeFromHome, 400);
+        // Safety fallback — if authStateChanged never fires after 6 seconds
+        setTimeout(() => {
+            console.warn('Auth timeout — redirecting to login');
+            window.location.href = '/auth/login.html';
+        }, 6000);
     </script>
 </body>
 </html>

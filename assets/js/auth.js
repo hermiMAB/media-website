@@ -56,7 +56,7 @@ async function logoutUser() {
         userRole = null;
 
         // Correct redirect for GitHub Pages
-        window.location.href = './auth/login.html';
+        window.location.href = '/auth/login.html';
 
         return true;
     } catch (error) {

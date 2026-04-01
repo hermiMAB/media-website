@@ -10,7 +10,7 @@ function protectPageAsAdmin() {
         // Must be logged in AND be admin
         if (!isAuthenticated()) {
             console.warn('[protectPageAsAdmin] ✗ Not authenticated, redirecting to login');
-            window.location.href = './auth/login.html';
+            window.location.href = '/auth/login.html';
             return false;
         }
         
@@ -33,14 +33,14 @@ function protectPageAsFaculty() {
         // Must be logged in
         if (!isAuthenticated()) {
             console.warn('[protectPageAsFaculty] ✗ Not authenticated, redirecting to login');
-            window.location.href = './auth/login.html';
+            window.location.href = '/auth/login.html';
             return false;
         }
         
         // Faculty or admin can access faculty pages
         if (!isFaculty() && !isAdmin()) {
             console.warn('[protectPageAsFaculty] ✗ Invalid role, redirecting to login');
-            window.location.href = './auth/login.html';
+            window.location.href = '/auth/login.html';
             return false;
         }
         
@@ -57,7 +57,7 @@ function protectPageAsAuthenticated() {
         // Just need to be logged in
         if (!isAuthenticated()) {
             console.warn('[protectPageAsAuthenticated] ✗ Not authenticated, redirecting to login');
-            window.location.href = './auth/login.html';
+            window.location.href = '/auth/login.html';
             return false;
         }
         
