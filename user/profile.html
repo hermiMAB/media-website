@@ -356,7 +356,7 @@
             deleteUserAccount(password)
                 .then(() => {
                     alert('Account deleted. Redirecting...');
-                    window.location.href = '../auth/login.html';
+                    window.location.href = '/auth/login.html';
                 })
                 .catch(error => alert('Error: ' + error.message));
         }
