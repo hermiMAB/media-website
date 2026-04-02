@@ -337,6 +337,7 @@
             const progressFill = document.getElementById('progress-fill');
             const progressText = document.getElementById('progress-text');
             const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
             let selectedFile = null;
         const submitBtn = document.getElementById('submit-btn');
 
@@ -397,10 +398,13 @@
                     <div class="file-item-name">${file.name}</div>
                     <div class="file-item-size">${formatFileSize(file.size)}</div>
                 </div>
-                <button type="button" class="file-item-remove" onclick="removeFile()">Remove</button>
+                <button type="button" class="file-item-remove">Remove</button>
             `;
             fileList.innerHTML = '';
             fileList.appendChild(li);
+            // Attach handler for remove button (make removeFile available globally too)
+            const btn = li.querySelector('.file-item-remove');
+            if (btn) btn.addEventListener('click', removeFile);
         }
 
         function removeFile() {
@@ -512,6 +516,8 @@
         const now = new Date();
         now.setDate(now.getDate() + 7);
         document.getElementById('deadline').value = now.toISOString().slice(0, 16);
+            // Expose removeFile for inline usage and debugging
+            window.removeFile = removeFile;
         } // Close setupForm function
     </script>
 </body>

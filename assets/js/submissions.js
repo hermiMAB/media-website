@@ -10,14 +10,13 @@ async function createSubmission(submissionData) {
     try {
         const user = auth.currentUser;
         if (!user) throw new Error('User not authenticated');
-        
-        // Get user profile for submission
+        // Get user profile for submission (may not exist)
         const userDoc = await db.collection('users').doc(user.uid).get();
-        const userData = userDoc.data();
-        
+        const userData = userDoc.exists ? userDoc.data() : {};
+
         const submission = {
             id: '', // Will be set after creation
-            submittedBy: userData.name || 'Unknown',
+            submittedBy: userData.name || user.displayName || user.email || 'Unknown',
             submitterEmail: user.email,
             department: userData.department || '',
             type: submissionData.type,
@@ -35,16 +34,19 @@ async function createSubmission(submissionData) {
             updatedAt: new Date().toISOString()
         };
         
+        // Debug: log payload
+        console.log('[createSubmission] payload:', submission);
+
         // Add to Firestore
         const docRef = await db.collection('submissions').add(submission);
-        
+
         // Update document with its own ID
         await docRef.update({ id: docRef.id });
-        
-        console.log('Submission created:', docRef.id);
+
+        console.log('✓ Submission created:', docRef.id);
         return { ...submission, id: docRef.id };
     } catch (error) {
-        console.error('✗ Create submission error:', error.message);
+        console.error('✗ Create submission error:', error);
         throw error;
     }
 }
@@ -110,11 +112,12 @@ async function getUserSubmissions() {
     try {
         const user = auth.currentUser;
         if (!user) throw new Error('User not authenticated');
-        
+        console.log('[getUserSubmissions] fetching for uid:', user.uid);
         const submissions = await getAllSubmissions({ submitterId: user.uid });
+        console.log(`[getUserSubmissions] retrieved ${submissions.length} submissions`);
         return submissions;
     } catch (error) {
-        console.error('✗ Get user submissions error:', error.message);
+        console.error('✗ Get user submissions error:', error);
         throw error;
     }
 }
