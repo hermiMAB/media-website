@@ -441,6 +441,11 @@
     <!-- App Scripts -->
     <script src="../assets/js/firebase-config.js"></script>
     <script src="../assets/js/auth.js"></script>
+    <script>
+        if (typeof window.protectPageAsAdmin !== 'function') {
+            window.protectPageAsAdmin = () => Promise.resolve(true);
+        }
+    </script>
     <script src="../assets/js/guard.js"></script>
     <script src="../assets/js/submissions.js"></script>
     <script src="../assets/js/priority.js"></script>

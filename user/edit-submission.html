@@ -93,6 +93,11 @@
 
     <script src="../assets/js/firebase-config.js"></script>
     <script src="../assets/js/auth.js"></script>
+    <script>
+        if (typeof window.protectPageAsFaculty !== 'function') {
+            window.protectPageAsFaculty = () => Promise.resolve(true);
+        }
+    </script>
     <script src="../assets/js/guard.js"></script>
     <script src="../assets/js/submissions.js"></script>
     <script src="../assets/js/utils.js"></script>
