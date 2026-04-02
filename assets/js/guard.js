@@ -41,6 +41,9 @@ function protectPageAsFaculty() {
         if (!isFaculty() && !isAdmin()) {
             console.warn('[protectPageAsFaculty] ✗ Invalid role, redirecting to login');
             window.location.href = '../auth/login.html';
+            return false;
+        }
+        
         console.log('[protectPageAsFaculty] Access granted');
         return true;
     });
